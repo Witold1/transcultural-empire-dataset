@@ -1,5 +1,6 @@
 # Transcultural Empire Peoplespace
 
+[![Website](https://img.shields.io/badge/Website-live-22863a?style=flat-square)](https://witold1.github.io/transcultural-empire-dataset/)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![MapLibre](https://img.shields.io/badge/Map-MapLibre%20GL-7DCDE3?style=flat-square)
@@ -22,7 +23,7 @@ From Russian Empire subjects to Soviet citizens, this project illustrates the po
 | Map | Province choropleth, fixed VisQuill lens, composition panels, side panel |
 | Data table | Full DBF attributes (language / religion / estate / nationality); click a row to open that unit on the map |
 
-Shared **1897 · 1926** year toggle across both views.
+Shared **1897 · 1926** year toggle and **Modern · Historical** basemap toggle (OpenHistoricalMap, dated to the selected census) across both views.
 
 ### 2. Years
 
@@ -62,7 +63,7 @@ Push to `main` (or `master`) runs [`.github/workflows/deploy-pages.yml`](.github
 
 One-time repo setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-Site URL will be `https://<user>.github.io/<repo-name>/`.
+Site URL: [https://witold1.github.io/transcultural-empire-dataset/](https://witold1.github.io/transcultural-empire-dataset/).
 
 ### Lint / typecheck
 
@@ -90,8 +91,7 @@ scripts/
 
 ## Next steps (ideas)
 
-- Period-matched historical basemaps under the choropleth - swap by year instead of a modern OSM backdrop.
-  - [OpenHistoricalMap](https://www.openhistoricalmap.org/) - easy to wire in; label and border coverage for these periods still thin.
+- Richer period-matched basemaps under the choropleth (Historical already uses [OpenHistoricalMap](https://www.openhistoricalmap.org/) filtered to the census year; empire-scale labels/borders remain thin).
   - [Map Warper](https://mapwarper.net/) - georeferenced scans as tiles; a 1914 Russian Empire sheet looked strong enough to try.
   - Purpose-crafted georeferenced tiles - own control sheet(s) if OHM / warper sources do not land well at empire scale.
 

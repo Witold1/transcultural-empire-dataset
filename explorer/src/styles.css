@@ -794,6 +794,10 @@
     padding-top: 0;
   }
 
+  .header-actions .chip-switch:last-child {
+    grid-column: 1 / -1;
+  }
+
   .chip-switch-group {
     display: grid;
     grid-template-columns: 1fr 1fr;

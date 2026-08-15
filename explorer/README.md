@@ -35,7 +35,7 @@ python -m ruff check scripts
 
 ## What you get
 
-- **Navbar** — Map / Data table views; shared 1897 · 1926 year toggle
+- **Navbar** — Map / Data table views; shared 1897 · 1926 year toggle; Modern / Historical basemap (OpenHistoricalMap, filtered to the census year)
 - **Map view** — choropleth, fixed VisQuill lens, composition panels, province side panel
 - **Data table** — full raw DBF attributes (all language / religion / estate / nationality columns); column-group filters; click a row to open on the map
 

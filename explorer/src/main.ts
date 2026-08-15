@@ -2,6 +2,7 @@ import * as maplibregl from "maplibre-gl";
 import type { ExpressionSpecification } from "maplibre-gl";
 import { CensusLens, type LensSelection } from "./lens";
 import { MapAdapter } from "./map-adapter";
+import { filterMapByYear } from "./ohm-dates";
 import { TableView, type RawTable } from "./table-view";
 import { fmtInt, fmtPct, unitHasCensus, type UnitProps } from "./types";
 import "./styles.css";
@@ -15,6 +16,13 @@ type MetricDef = {
 };
 
 type AppView = "map" | "table";
+type BasemapId = "modern" | "historical";
+
+const BASEMAP_STYLES: Record<BasemapId, string> = {
+  modern: "https://tiles.openfreemap.org/styles/liberty",
+  historical:
+    "https://www.openhistoricalmap.org/map-styles/main/main.json",
+};
 
 const PLAIN_FILL = "#d4b483";
 const NO_CENSUS_FILL = "#cfc6b8";
@@ -90,8 +98,12 @@ const COLORS = [
 let year = 1897;
 let metricId = "none";
 let view: AppView = "map";
+let basemap: BasemapId = "modern";
 let featuresById = new Map<string, UnitProps>();
 let featuresByIdGeom = new Map<string, GeoJSON.Geometry>();
+let lastGeojson: GeoJSON.FeatureCollection | null = null;
+let censusEventsWired = false;
+let basemapSwapToken = 0;
 const rawTableCache = new Map<number, RawTable>();
 
 const mapRoot = document.getElementById("map-root") as HTMLDivElement;
@@ -455,22 +467,56 @@ function syncYearButtons(): void {
   });
 }
 
-async function loadYear(y: number): Promise<void> {
+function syncBasemapButtons(): void {
+  document.querySelectorAll<HTMLButtonElement>(".chip-btn[data-basemap]").forEach((btn) => {
+    const on = btn.dataset.basemap === basemap;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
+function fillOpacityForBasemap(): number {
+  // Historical basemap needs more show-through than the modern Liberty style.
+  return basemap === "historical" ? 0.55 : 0.82;
+}
+
+function applyOhmDateFilter(): void {
+  const m = map.map;
+  if (!m || basemap !== "historical") return;
+  filterMapByYear(m, year);
+}
+
+function wireCensusLayerEvents(m: maplibregl.Map): void {
+  if (censusEventsWired) return;
+  censusEventsWired = true;
+
+  m.on("click", FILL_ID, (e) => {
+    const f = e.features?.[0];
+    if (!f?.properties) return;
+    const cached = resolveFeature(f.properties as UnitProps);
+    if (!cached) return;
+    const geom = featuresByIdGeom.get(cached.id);
+    if (geom) lens.panUnitUnderLens(geom);
+  });
+
+  m.on("mouseenter", FILL_ID, () => {
+    m.getCanvas().style.cursor = "pointer";
+  });
+  m.on("mouseleave", FILL_ID, () => {
+    m.getCanvas().style.cursor = "";
+  });
+}
+
+function ensureCensusLayers(geojson: GeoJSON.FeatureCollection): void {
   const m = map.map;
   if (!m) return;
-  const res = await fetch(dataUrl(`${y}.geojson`));
-  const geojson = await res.json();
-
-  featuresById = new Map();
-  featuresByIdGeom = new Map();
-  for (const f of geojson.features) {
-    featuresById.set(f.properties.id, f.properties as UnitProps);
-    if (f.geometry) featuresByIdGeom.set(f.properties.id, f.geometry);
-  }
 
   const existing = m.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
   if (existing) {
     existing.setData(geojson);
+    if (m.getLayer(FILL_ID)) {
+      m.setPaintProperty(FILL_ID, "fill-opacity", fillOpacityForBasemap());
+    }
   } else {
     m.addSource(SOURCE_ID, { type: "geojson", data: geojson });
     m.addLayer({
@@ -479,7 +525,7 @@ async function loadYear(y: number): Promise<void> {
       source: SOURCE_ID,
       paint: {
         "fill-color": PLAIN_FILL,
-        "fill-opacity": 0.82,
+        "fill-opacity": fillOpacityForBasemap(),
       },
     });
     m.addLayer({
@@ -492,23 +538,50 @@ async function loadYear(y: number): Promise<void> {
         "line-opacity": 0.55,
       },
     });
-
-    m.on("click", FILL_ID, (e) => {
-      const f = e.features?.[0];
-      if (!f?.properties) return;
-      const cached = resolveFeature(f.properties as UnitProps);
-      if (!cached) return;
-      const geom = featuresByIdGeom.get(cached.id);
-      if (geom) lens.panUnitUnderLens(geom);
-    });
-
-    m.on("mouseenter", FILL_ID, () => {
-      m.getCanvas().style.cursor = "pointer";
-    });
-    m.on("mouseleave", FILL_ID, () => {
-      m.getCanvas().style.cursor = "";
-    });
   }
+
+  wireCensusLayerEvents(m);
+}
+
+function setBasemap(next: BasemapId): void {
+  if (next === basemap) return;
+  const m = map.map;
+  if (!m) return;
+
+  basemap = next;
+  syncBasemapButtons();
+
+  const token = ++basemapSwapToken;
+  m.setStyle(BASEMAP_STYLES[next]);
+  m.once("style.load", () => {
+    if (token !== basemapSwapToken) return;
+    if (lastGeojson) {
+      ensureCensusLayers(lastGeojson);
+      applyChoropleth();
+      lens.refresh();
+    }
+    applyOhmDateFilter();
+  });
+}
+
+async function loadYear(y: number): Promise<void> {
+  const m = map.map;
+  if (!m) return;
+  const res = await fetch(dataUrl(`${y}.geojson`));
+  const geojson = (await res.json()) as GeoJSON.FeatureCollection;
+
+  featuresById = new Map();
+  featuresByIdGeom = new Map();
+  for (const f of geojson.features) {
+    const props = f.properties as UnitProps | null;
+    if (!props?.id) continue;
+    featuresById.set(props.id, props);
+    if (f.geometry) featuresByIdGeom.set(props.id, f.geometry);
+  }
+
+  lastGeojson = geojson;
+  ensureCensusLayers(geojson);
+  applyOhmDateFilter();
 
   lens.setYear(y);
   lens.clear();
@@ -524,9 +597,9 @@ async function loadYear(y: number): Promise<void> {
   for (const f of geojson.features) {
     const g = f.geometry;
     const coords: number[][] =
-      g.type === "Polygon"
+      g?.type === "Polygon"
         ? g.coordinates.flat()
-        : g.type === "MultiPolygon"
+        : g?.type === "MultiPolygon"
           ? g.coordinates.flat(2)
           : [];
     for (const [lng, lat] of coords) {
@@ -544,6 +617,7 @@ async function loadYear(y: number): Promise<void> {
 function wireUi(): void {
   refreshMetricOptions();
   syncYearButtons();
+  syncBasemapButtons();
 
   panelDrawerToggle.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -567,6 +641,13 @@ function wireUi(): void {
       syncYearButtons();
       refreshMetricOptions();
       void loadYear(year);
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".chip-btn[data-basemap]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const next = (btn.dataset.basemap as BasemapId) || "modern";
+      setBasemap(next);
     });
   });
 

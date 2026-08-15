@@ -305,11 +305,14 @@ export class CensusLens {
         id: HL_FILL,
         type: "fill",
         source: HL_SOURCE,
-        paint: { "fill-color": "#E53935", "fill-opacity": 0.92 },
+        paint: {
+          "fill-color": "#FF6B6B",
+          "fill-opacity": 0.3,
+        },
       });
     } else {
-      m.setPaintProperty(HL_FILL, "fill-color", "#E53935");
-      m.setPaintProperty(HL_FILL, "fill-opacity", 0.92);
+      m.setPaintProperty(HL_FILL, "fill-color", "#FF6B6B");
+      m.setPaintProperty(HL_FILL, "fill-opacity", 0.3);
     }
     if (!m.getLayer(HL_LINE)) {
       m.addLayer({
@@ -317,15 +320,15 @@ export class CensusLens {
         type: "line",
         source: HL_SOURCE,
         paint: {
-          "line-color": "#B71C1C",
-          "line-width": 3.2,
-          "line-opacity": 1,
+          "line-color": "#FF0000",
+          "line-width": 1.5,
+          "line-opacity": 0.85,
         },
       });
     } else {
-      m.setPaintProperty(HL_LINE, "line-color", "#B71C1C");
-      m.setPaintProperty(HL_LINE, "line-width", 3.2);
-      m.setPaintProperty(HL_LINE, "line-opacity", 1);
+      m.setPaintProperty(HL_LINE, "line-color", "#FF0000");
+      m.setPaintProperty(HL_LINE, "line-width", 1.5);
+      m.setPaintProperty(HL_LINE, "line-opacity", 0.85);
     }
   }
 
