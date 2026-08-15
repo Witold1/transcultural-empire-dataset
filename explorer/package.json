@@ -1,0 +1,27 @@
+{
+  "name": "transcultural-empire-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "prepare-data": "python ../scripts/prepare_geojson.py"
+  },
+  "dependencies": {
+    "@visquill/visquill-gdk": "^1.0.0",
+    "maplibre-gl": "^5.24.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.67.0",
+    "vite": "^6.0.0"
+  }
+}

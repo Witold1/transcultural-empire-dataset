@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transcultural Empire Peoplescape Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    #app { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="site-header" role="banner">
+      <div class="header-inner">
+        <div class="title-block">
+          <h1>Transcultural Empire Peoplespace</h1>
+          <p class="subtitle">Two censuses, almost one territory remade: see urbanization, sex, language, faith, estate, and nationality numbers across the Russian Empire and the early Soviet Union.</p>
+        </div>
+        <div class="header-actions">
+          <div class="chip-switch">
+            <span class="chip-switch-label" id="view-label">View</span>
+            <div class="chip-switch-group" role="group" aria-labelledby="view-label">
+              <button type="button" class="chip-btn is-active" data-view="map" aria-pressed="true">Map</button>
+              <button type="button" class="chip-btn" data-view="table" aria-pressed="false">Table</button>
+            </div>
+          </div>
+          <div class="chip-switch">
+            <span class="chip-switch-label" id="census-label">Census</span>
+            <div class="chip-switch-group" role="group" aria-labelledby="census-label">
+              <button type="button" class="chip-btn is-active" data-year="1897" aria-pressed="true">1897</button>
+              <button type="button" class="chip-btn" data-year="1926" aria-pressed="false">1926</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="view-map" class="view view-map active" aria-label="Map explorer">
+      <div id="map-root"></div>
+      <aside id="panel" class="panel">
+        <button
+          type="button"
+          class="panel-drawer-toggle"
+          id="panel-drawer-toggle"
+          aria-expanded="false"
+          aria-controls="panel-body"
+        >
+          <span class="panel-drawer-grip" aria-hidden="true"></span>
+          <span class="panel-drawer-text">Details</span>
+        </button>
+        <div id="panel-body" class="panel-body">
+          <header class="panel-header">
+            <p class="lede"><span class="lede-hint" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" focusable="false"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="5" r="1" fill="currentColor"/><path d="M8 7.25v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>The ring stays in the center of the map. Pan a province into it, or click one. Bars show who was counted in that unit.</p>
+          </header>
+
+          <div class="controls">
+            <label class="control">
+              <span>Color map by</span>
+              <select id="metric"></select>
+            </label>
+          </div>
+
+          <div id="legend" class="legend"></div>
+
+          <div id="selection" class="selection empty">
+            <p class="hint">Click a province on the map.</p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="view-table" class="view view-table" hidden aria-label="Data table">
+      <div id="table-root" class="table-root"></div>
+    </section>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

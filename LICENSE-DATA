@@ -1,0 +1,12 @@
+Census GIS under data/raw/ (Sablin et al.) and derived files under
+data/processed/ are subject to the license terms published with the upstream
+dataset:
+
+  Sablin, Ivan et al., 2015,
+  "Transcultural Empire: Geographic Information System of the 1897 and 1926
+  General Censuses in the Russian Empire and Soviet Union",
+  https://doi.org/10.11588/data/10064, heiDATA.
+
+heiDATA records custom terms for this DOI — follow that record (not this file)
+for redistribution and reuse conditions.
+Cite the DOI when using the data.
