@@ -122,9 +122,10 @@ const mobilePanelMq = window.matchMedia("(max-width: 860px)");
 function setPanelDrawerOpen(open: boolean): void {
   panelEl.classList.toggle("is-open", open);
   panelDrawerToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  panelDrawerToggle.querySelector(".panel-drawer-text")!.textContent = open
-    ? "Close"
-    : "Details";
+  panelDrawerToggle.setAttribute(
+    "aria-label",
+    open ? "Hide details" : "Show details"
+  );
 }
 
 const { map, rvg } = MapAdapter.create(mapRoot, "app-", {
@@ -236,11 +237,11 @@ function colorExpression(field: string, edges: number[]): ExpressionSpecificatio
 function renderLegend(edges: number[], metric: MetricDef): void {
   const noCensusRow =
     year === 1897
-      ? `<div class="legend-row"><span class="swatch" style="background:${NO_CENSUS_FILL}"></span><span>Not in 1897 census</span></div>`
+      ? `<div class="legend-row"><span class="swatch" style="background:${NO_CENSUS_FILL}"></span><span>Not in 1897 Census</span></div>`
       : "";
   if (metric.id === "none") {
     legendEl.innerHTML = `<div class="legend-title">Regions</div>
-      <div class="legend-row"><span class="swatch" style="background:${PLAIN_FILL}"></span><span>In census</span></div>
+      <div class="legend-row"><span class="swatch" style="background:${PLAIN_FILL}"></span><span>Covered by census</span></div>
       ${noCensusRow}`;
     return;
   }
@@ -518,26 +519,36 @@ function ensureCensusLayers(geojson: GeoJSON.FeatureCollection): void {
       m.setPaintProperty(FILL_ID, "fill-opacity", fillOpacityForBasemap());
     }
   } else {
+    // Insert under highlight layers when they already exist (e.g. after map load).
+    const beforeId = m.getLayer("highlighted-units-fill")
+      ? "highlighted-units-fill"
+      : undefined;
     m.addSource(SOURCE_ID, { type: "geojson", data: geojson });
-    m.addLayer({
-      id: FILL_ID,
-      type: "fill",
-      source: SOURCE_ID,
-      paint: {
-        "fill-color": PLAIN_FILL,
-        "fill-opacity": fillOpacityForBasemap(),
+    m.addLayer(
+      {
+        id: FILL_ID,
+        type: "fill",
+        source: SOURCE_ID,
+        paint: {
+          "fill-color": PLAIN_FILL,
+          "fill-opacity": fillOpacityForBasemap(),
+        },
       },
-    });
-    m.addLayer({
-      id: LINE_ID,
-      type: "line",
-      source: SOURCE_ID,
-      paint: {
-        "line-color": "#3a2a1a",
-        "line-width": 0.6,
-        "line-opacity": 0.55,
+      beforeId
+    );
+    m.addLayer(
+      {
+        id: LINE_ID,
+        type: "line",
+        source: SOURCE_ID,
+        paint: {
+          "line-color": "#3a2a1a",
+          "line-width": 0.6,
+          "line-opacity": 0.55,
+        },
       },
-    });
+      beforeId
+    );
   }
 
   wireCensusLayerEvents(m);
@@ -552,7 +563,7 @@ function setBasemap(next: BasemapId): void {
   syncBasemapButtons();
 
   const token = ++basemapSwapToken;
-  m.setStyle(BASEMAP_STYLES[next]);
+  m.setStyle(BASEMAP_STYLES[next], { diff: false });
   m.once("style.load", () => {
     if (token !== basemapSwapToken) return;
     if (lastGeojson) {

@@ -76,7 +76,8 @@
   stroke: none;
 }
 
-.app-lens-subtitle {
+.app-lens-subtitle,
+.app-lens-subtitle2 {
   fill: #1a1510;
   font-size: 14px;
   font-weight: 500;
@@ -175,7 +176,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.85rem 1.75rem;
-  padding: 0.9rem 1.35rem 0.95rem;
+  padding: 1.0rem 0.75rem 0.75rem;
 }
 
 .title-block {
@@ -194,7 +195,6 @@
 }
 
 .subtitle {
-  margin: 0.35rem 0 0;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.45;
@@ -206,67 +206,86 @@
   display: flex;
   flex-wrap: wrap;
   flex-shrink: 0;
-  align-items: flex-start;
-  gap: 0.75rem 1.15rem;
-  padding-top: 0.2rem;
+  align-items: center;
+  gap: 0.35rem 1.35rem;
+  padding-top: 0.35rem;
 }
 
 .chip-switch {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.55rem;
 }
 
 .chip-switch-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b5b48;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: normal;
+  color: #1a1510;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
 .chip-switch-group {
   display: inline-flex;
-  border: 1px solid #b8a88f;
-  overflow: hidden;
-  background: #fffdf8;
+  align-items: baseline;
+  gap: 0;
 }
 
 .chip-btn {
+  position: relative;
   margin: 0;
-  padding: 0.4rem 0.75rem;
-  border: none;
-  border-right: 1px solid #d6c9b4;
+  padding: 0.15rem 0.42rem;
+  border: 0;
+  border-radius: 0;
   background: transparent;
   color: #5a4d3e;
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.04em;
   line-height: 1.2;
+  cursor: pointer;
 }
 
-.chip-btn:last-child {
-  border-right: none;
+.chip-btn + .chip-btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 0.65em;
+  transform: translateY(-50%);
+  background: #c4b49a;
+  pointer-events: none;
 }
 
 .chip-btn:hover {
   color: #1a1510;
-  background: #f3ebdd;
 }
 
 .chip-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
-  position: relative;
-  z-index: 1;
+  border-radius: 2px;
 }
 
 .chip-btn.is-active {
   color: #1a1510;
-  background: #f3ebdd;
-  box-shadow: inset 2px -2px 0 #000000
+  font-style: normal;
+  font-weight: 600;
+}
+
+.chip-btn.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0.42rem;
+  right: 0.42rem;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
 }
 
 .view {
@@ -503,7 +522,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 1.25rem 1.25rem 1rem;
+  padding: 0.75rem 0.75rem 1.0rem;
 }
 
 .panel-header,
@@ -574,7 +593,6 @@
 .legend {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
   padding: 0.65rem 0.7rem;
   background: #fffdf8;
   border: 1px solid #d6c9b4;
@@ -710,7 +728,6 @@
 .stats .stat-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
   position: relative;
 }
 
@@ -789,18 +806,8 @@
   }
 
   .header-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem 1.1rem;
     padding-top: 0;
-  }
-
-  .header-actions .chip-switch:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .chip-switch-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
 
   .view-map.active {
@@ -822,7 +829,7 @@
     bottom: 0;
     z-index: 4;
     height: auto;
-    max-height: 3.4rem;
+    max-height: 2.35rem;
     border-radius: 14px 14px 0 0;
     box-shadow: 0 -8px 28px rgba(40, 28, 14, 0.16);
     transition: max-height 0.28s ease;
@@ -835,25 +842,27 @@
 
   .panel-drawer-toggle {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
     flex: 0 0 auto;
     width: 100%;
     margin: 0;
-    padding: 0.55rem 1rem 0.65rem;
+    padding: 0.45rem 1rem 0.4rem;
     border: 0;
-    border-bottom: 1px solid #e4d8c4;
+    border-bottom: 1px solid transparent;
     background: transparent;
-    color: #5a4d3e;
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    color: #8a7660;
     cursor: pointer;
     touch-action: manipulation;
+  }
+
+  .panel.is-open .panel-drawer-toggle {
+    border-bottom-color: #e4d8c4;
+  }
+
+  .panel-drawer-toggle:hover,
+  .panel-drawer-toggle:focus-visible {
+    color: #1a1510;
   }
 
   .panel-drawer-toggle:focus-visible {
@@ -861,12 +870,13 @@
     box-shadow: inset var(--focus-ring);
   }
 
-  .panel-drawer-grip {
+  .panel-drawer-chevron {
     display: block;
-    width: 2.4rem;
-    height: 0.28rem;
-    border-radius: 99px;
-    background: #b8a88f;
+    transition: transform 0.22s ease;
+  }
+
+  .panel.is-open .panel-drawer-chevron {
+    transform: rotate(180deg);
   }
 
   .panel-body {
@@ -884,7 +894,8 @@
 }
 
 @media (max-width: 860px) and (prefers-reduced-motion: reduce) {
-  .panel {
+  .panel,
+  .panel-drawer-chevron {
     transition: none;
   }
 }

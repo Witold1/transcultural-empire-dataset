@@ -4,7 +4,7 @@
  * - Minimal single-ring lens at graphic center; map pans underneath.
  * - Map outside the ring is softly dimmed.
  * - Left / right / bottom panels: title + slim horizontal bars (no leaders).
- * - On narrow viewports, notes drop the bars and show label + % only.
+ * - On narrow viewports, notes drop the bars and show “label N%” inline.
  */
 import * as maplibregl from "maplibre-gl";
 import {
@@ -73,7 +73,8 @@ const BAR_MAX = 96;
 const LABEL_W = 118;
 const PCT_W = 44;
 const PANEL_W = LABEL_W + BAR_MAX + PCT_W + 12;
-const PANEL_W_COMPACT = LABEL_W + PCT_W + 12;
+/** Compact notes: “Label 99%” inline, no bars. */
+const PANEL_W_COMPACT = 168;
 const GUTTER = 40;
 const PANEL_PAD_Y = 8;
 const COMPACT_NOTES_MQ = "(max-width: 860px)";
@@ -120,6 +121,7 @@ export class CensusLens {
 
   private title: RvgAnchoredText;
   private subtitle: RvgAnchoredText;
+  private subtitle2: RvgAnchoredText;
   private panels: PanelSlot[] = [];
   private panelLayer: RvgGroup;
   private dimEl: HTMLDivElement;
@@ -175,11 +177,15 @@ export class CensusLens {
 
     this.title = lensLayer.text.label("Pan map under lens", "title");
     this.subtitle = lensLayer.text.label(`census ${this.year}`, "subtitle");
+    this.subtitle2 = lensLayer.text.label("", "subtitle2");
     Attach.pointToPoint(this.title, this.rvg.center, {
-      offset: { x: 0, y: -(this.radiusPx + 48) },
+      offset: { x: 0, y: -(this.radiusPx + 58) },
     });
     Attach.pointToPoint(this.subtitle, this.rvg.center, {
-      offset: { x: 0, y: -(this.radiusPx + 22) },
+      offset: { x: 0, y: -(this.radiusPx + 34) },
+    });
+    Attach.pointToPoint(this.subtitle2, this.rvg.center, {
+      offset: { x: 0, y: -(this.radiusPx + 16) },
     });
 
     this.panels = this.buildPanels();
@@ -205,7 +211,15 @@ export class CensusLens {
       this.layoutPanels(c.x, c.y, r);
     });
 
-    for (const el of [ring, aim, crossH, crossV, this.title, this.subtitle]) {
+    for (const el of [
+      ring,
+      aim,
+      crossH,
+      crossV,
+      this.title,
+      this.subtitle,
+      this.subtitle2,
+    ]) {
       nonePointer(el);
     }
 
@@ -229,6 +243,7 @@ export class CensusLens {
     this.year = year;
     if (this.focusedId === null) {
       this.subtitle.value = `census ${this.year}`;
+      this.subtitle2.value = "";
     }
   }
 
@@ -260,6 +275,7 @@ export class CensusLens {
     if (!sel) {
       this.title.value = "Pan map under lens";
       this.subtitle.value = `census ${this.year}`;
+      this.subtitle2.value = "";
       this.livePanels = [
         { title: "", rows: [] },
         { title: "", rows: [] },
@@ -273,7 +289,8 @@ export class CensusLens {
 
     this.title.value = sel.nameEng || "Unnamed";
     if (!sel.hasCensus) {
-      this.subtitle.value = `census ${sel.year}${SEP}not in census`;
+      this.subtitle.value = `census ${sel.year}${SEP}not covered by census`;
+      this.subtitle2.value = "";
       // No composition rows — keep note titles blank (same as no selection).
       this.livePanels = [
         { title: "", rows: [] },
@@ -282,8 +299,17 @@ export class CensusLens {
       ];
     } else {
       const pop = sel.popAll ?? 0;
-      const urban = sel.urbanPct ?? 0;
-      this.subtitle.value = `census ${sel.year}${SEP}${fmtPop(pop)} people${SEP}share urban ${urban.toFixed(1)}%`;
+      const urban = sel.urbanPct;
+      const sex = sel.sexRatio;
+      this.subtitle.value = `census ${sel.year}${SEP}${fmtPop(pop)} people`;
+      const line2: string[] = [];
+      if (urban != null && Number.isFinite(urban)) {
+        line2.push(`urban ${urban.toFixed(1)}%`);
+      }
+      if (sex != null && Number.isFinite(sex)) {
+        line2.push(`sex ratio ${sex.toFixed(3)}`);
+      }
+      this.subtitle2.value = line2.join(SEP);
       this.livePanels = this.panelsForSelection(sel);
     }
     this.setHighlight(sel);
@@ -306,13 +332,13 @@ export class CensusLens {
         type: "fill",
         source: HL_SOURCE,
         paint: {
-          "fill-color": "#FF6B6B",
-          "fill-opacity": 0.3,
+          "fill-color": "#a04840",
+          "fill-opacity": 0.18,
         },
       });
     } else {
-      m.setPaintProperty(HL_FILL, "fill-color", "#FF6B6B");
-      m.setPaintProperty(HL_FILL, "fill-opacity", 0.3);
+      m.setPaintProperty(HL_FILL, "fill-color", "#a04840");
+      m.setPaintProperty(HL_FILL, "fill-opacity", 0.18);
     }
     if (!m.getLayer(HL_LINE)) {
       m.addLayer({
@@ -320,16 +346,20 @@ export class CensusLens {
         type: "line",
         source: HL_SOURCE,
         paint: {
-          "line-color": "#FF0000",
-          "line-width": 1.5,
-          "line-opacity": 0.85,
+          "line-color": "#7a342c",
+          "line-width": 1.25,
+          "line-opacity": 0.5,
         },
       });
     } else {
-      m.setPaintProperty(HL_LINE, "line-color", "#FF0000");
-      m.setPaintProperty(HL_LINE, "line-width", 1.5);
-      m.setPaintProperty(HL_LINE, "line-opacity", 0.85);
+      m.setPaintProperty(HL_LINE, "line-color", "#7a342c");
+      m.setPaintProperty(HL_LINE, "line-width", 1.25);
+      m.setPaintProperty(HL_LINE, "line-opacity", 0.5);
     }
+    // Keep highlight above choropleth. Basemap swaps re-add census layers
+    // after the highlight, which used to bury it and change the look.
+    if (m.getLayer(HL_FILL)) m.moveLayer(HL_FILL);
+    if (m.getLayer(HL_LINE)) m.moveLayer(HL_LINE);
   }
 
   private setHighlight(sel: LensSelection | null): void {
@@ -428,22 +458,6 @@ export class CensusLens {
       ];
     }
     const pop = sel.popAll ?? 0;
-    const urbanPct = sel.urbanPct ?? 0;
-    const urbanShare = Math.min(1, Math.max(0, urbanPct / 100));
-    const urban: GroupRow[] = [
-      {
-        id: "urban",
-        label: "Urban",
-        count: Math.round(urbanShare * pop),
-        share: urbanShare,
-      },
-      {
-        id: "rural",
-        label: "Rural",
-        count: Math.round((1 - urbanShare) * pop),
-        share: 1 - urbanShare,
-      },
-    ];
     const sexShareM =
       sel.sexRatio != null && Number.isFinite(sel.sexRatio)
         ? sel.sexRatio / (1 + sel.sexRatio)
@@ -464,7 +478,7 @@ export class CensusLens {
     ];
     return [
       { title: "Nationality", rows: sel.nationalities ?? [] },
-      { title: "Urban / rural", rows: urban },
+      { title: "", rows: [] },
       { title: "Sex", rows: sex },
     ];
   }
@@ -536,19 +550,23 @@ export class CensusLens {
           continue;
         }
 
-        slot.label.value = shortLabel(row.label, compact ? 14 : 18);
-        slot.pct.value = `${(100 * row.share).toFixed(0)}%`;
+        const pctStr = `${(100 * row.share).toFixed(0)}%`;
         slot.labelAt.x = origin.x;
         slot.labelAt.y = y;
-        slot.pctAt.x = compact ? barX + 4 : barX + BAR_MAX + 10;
         slot.pctAt.y = y;
 
         if (compact) {
+          slot.label.value = `${shortLabel(row.label, 18)} ${pctStr}`;
+          slot.pct.value = "";
+          slot.pctAt.x = origin.x;
           slot.track.visible.value = false;
           slot.fill.visible.value = false;
           hBar(barX, y, 0, BAR_H, slot.track);
           hBar(barX, y, 0, BAR_H, slot.fill);
         } else {
+          slot.label.value = shortLabel(row.label, 18);
+          slot.pct.value = pctStr;
+          slot.pctAt.x = barX + BAR_MAX + 10;
           hBar(barX, y, BAR_MAX, BAR_H, slot.track);
           hBar(
             barX,
