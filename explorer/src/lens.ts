@@ -75,6 +75,7 @@ const PCT_W = 44;
 const PANEL_W = LABEL_W + BAR_MAX + PCT_W + 12;
 /** Compact notes: “Label 99%” inline, no bars. */
 const PANEL_W_COMPACT = 168;
+const LENS_R_COMPACT = 80;
 const GUTTER = 40;
 const PANEL_PAD_Y = 8;
 const COMPACT_NOTES_MQ = "(max-width: 860px)";
@@ -83,6 +84,10 @@ const SEP = " ◆ ";
 
 function compactLensNotes(): boolean {
   return window.matchMedia(COMPACT_NOTES_MQ).matches;
+}
+
+function lensRadiusPx(base: number): number {
+  return compactLensNotes() ? LENS_R_COMPACT : base;
 }
 
 function fmtPop(n: number): string {
@@ -178,15 +183,13 @@ export class CensusLens {
     this.title = lensLayer.text.label("Pan map under lens", "title");
     this.subtitle = lensLayer.text.label(`census ${this.year}`, "subtitle");
     this.subtitle2 = lensLayer.text.label("", "subtitle2");
-    Attach.pointToPoint(this.title, this.rvg.center, {
-      offset: { x: 0, y: -(this.radiusPx + 58) },
-    });
-    Attach.pointToPoint(this.subtitle, this.rvg.center, {
-      offset: { x: 0, y: -(this.radiusPx + 34) },
-    });
-    Attach.pointToPoint(this.subtitle2, this.rvg.center, {
-      offset: { x: 0, y: -(this.radiusPx + 16) },
-    });
+    const titleAt = lensLayer.visuals.point("title-at");
+    const subtitleAt = lensLayer.visuals.point("subtitle-at");
+    const subtitle2At = lensLayer.visuals.point("subtitle2-at");
+    for (const at of [titleAt, subtitleAt, subtitle2At]) nonePointer(at);
+    Attach.pointToPoint(this.title, titleAt);
+    Attach.pointToPoint(this.subtitle, subtitleAt);
+    Attach.pointToPoint(this.subtitle2, subtitle2At);
 
     this.panels = this.buildPanels();
 
@@ -194,7 +197,7 @@ export class CensusLens {
     const CROSS = 8;
     Reactive.do([this.rvg.frame], () => {
       const c = this.rvg.center;
-      const r = this.radiusPx;
+      const r = lensRadiusPx(this.radiusPx);
       Circles.circleAt(c, r, ring);
       Circles.circleAt(c, AIM_R, aim);
       Segments.segment(
@@ -207,6 +210,12 @@ export class CensusLens {
         { x: c.x, y: c.y + CROSS },
         crossV
       );
+      titleAt.x = c.x;
+      titleAt.y = c.y - (r + 58);
+      subtitleAt.x = c.x;
+      subtitleAt.y = c.y - (r + 34);
+      subtitle2At.x = c.x;
+      subtitle2At.y = c.y - (r + 16);
       this.dimEl.style.background = `radial-gradient(circle ${r}px at ${c.x}px ${c.y}px, transparent ${r - 0.5}px, rgba(26, 21, 16, 0.20) ${r}px)`;
       this.layoutPanels(c.x, c.y, r);
     });
@@ -282,7 +291,11 @@ export class CensusLens {
         { title: "", rows: [] },
       ];
       this.setHighlight(null);
-      this.layoutPanels(this.rvg.center.x, this.rvg.center.y, this.radiusPx);
+      this.layoutPanels(
+        this.rvg.center.x,
+        this.rvg.center.y,
+        lensRadiusPx(this.radiusPx)
+      );
       this.onChange(null);
       return;
     }
@@ -313,7 +326,11 @@ export class CensusLens {
       this.livePanels = this.panelsForSelection(sel);
     }
     this.setHighlight(sel);
-    this.layoutPanels(this.rvg.center.x, this.rvg.center.y, this.radiusPx);
+    this.layoutPanels(
+      this.rvg.center.x,
+      this.rvg.center.y,
+      lensRadiusPx(this.radiusPx)
+    );
     this.onChange(sel);
   }
 
@@ -457,29 +474,10 @@ export class CensusLens {
         { title: "Estate", rows: sel.estates ?? [] },
       ];
     }
-    const pop = sel.popAll ?? 0;
-    const sexShareM =
-      sel.sexRatio != null && Number.isFinite(sel.sexRatio)
-        ? sel.sexRatio / (1 + sel.sexRatio)
-        : 0.5;
-    const sex: GroupRow[] = [
-      {
-        id: "male",
-        label: "Male",
-        count: Math.round(sexShareM * pop),
-        share: sexShareM,
-      },
-      {
-        id: "female",
-        label: "Female",
-        count: Math.round((1 - sexShareM) * pop),
-        share: 1 - sexShareM,
-      },
-    ];
     return [
       { title: "Nationality", rows: sel.nationalities ?? [] },
       { title: "", rows: [] },
-      { title: "Sex", rows: sex },
+      { title: "", rows: [] },
     ];
   }
 
@@ -525,13 +523,15 @@ export class CensusLens {
       const panel = this.panels[p];
       const pack = this.livePanels[p] ?? { title: "", rows: [] };
       const origin = this.panelOrigin(panel.dock, cx, cy, r, panelW);
+      const alignEnd = compact && panel.dock === "right";
+      const textX = alignEnd ? origin.x + panelW : origin.x;
 
       const rows = pack.rows.slice(0, ROWS);
       const hasData = rows.some((row) => row.share > 0);
 
       // Hide orphan titles when a note has no bars (e.g. not-in-census units).
       panel.title.value = hasData ? pack.title : "";
-      panel.titleAt.x = origin.x;
+      panel.titleAt.x = textX;
       panel.titleAt.y = origin.y + 8;
 
       for (let i = 0; i < ROWS; i++) {
@@ -551,14 +551,14 @@ export class CensusLens {
         }
 
         const pctStr = `${(100 * row.share).toFixed(0)}%`;
-        slot.labelAt.x = origin.x;
+        slot.labelAt.x = textX;
         slot.labelAt.y = y;
         slot.pctAt.y = y;
 
         if (compact) {
           slot.label.value = `${shortLabel(row.label, 18)} ${pctStr}`;
           slot.pct.value = "";
-          slot.pctAt.x = origin.x;
+          slot.pctAt.x = textX;
           slot.track.visible.value = false;
           slot.fill.visible.value = false;
           hBar(barX, y, 0, BAR_H, slot.track);

@@ -11,6 +11,9 @@
 ![License](https://img.shields.io/badge/License-MIT%20%2B%20DOI%20data-lightgrey?style=flat-square)
 ![AI Assistance](https://img.shields.io/badge/AI--Assistance-high-informational?style=flat-square)
 
+<p align="center">
+  <img src="./transcultural-empire-dataset-explorer.jpg" width="500" alt="Preview of Transcultural Empire (Peoplespace) dataset explorer interface.">
+</p>
 
 From Russian Empire subjects to Soviet citizens, this project illustrates the population changes using data from the 1897 and 1926 censuses via maps and tables. The 1897 Imperial census asked respondents about their social estate, native language, and religious affiliation, whereas the 1926 Soviet census asked about "nationality" (self-declared "narodnost", in the sense of ethnic identity) and native language (for some reason not included in this dataset). Backbone data comes from [Sablin et al. doi:10.11588/DATA/10064](https://doi.org/10.11588/data/10064). You can see examples of original census forms under [Documents of the General Population Census of 1897](https://yulianovozhilova.ru/perepis1897-doc) and [Population census of 1926. Types of documents](https://yulianovozhilova.ru/per1926).
 

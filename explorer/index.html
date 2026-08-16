@@ -18,15 +18,41 @@
     <header class="site-header" role="banner">
       <div class="header-inner">
         <div class="title-block">
-          <h1>Transcultural Empire Peoplespace</h1>
+          <div class="title-row">
+            <h1>Transcultural Empire Peoplespace</h1>
+            <button
+              type="button"
+              class="chrome-toggle header-actions-toggle"
+              id="header-actions-toggle"
+              aria-expanded="false"
+              aria-controls="header-actions"
+              aria-label="Show controls"
+            >
+              <svg class="chrome-chevron" viewBox="0 0 24 12" width="28" height="14" aria-hidden="true" focusable="false">
+                <path d="M4 9.5 12 2.5l8 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
           <p class="subtitle">Two censuses, almost one territory remade: see urbanization, sex, language, faith, estate, and nationality numbers across the Russian Empire and the early Soviet Union.</p>
         </div>
-        <div class="header-actions">
+        <div id="header-actions" class="header-actions">
           <div class="chip-switch">
             <span class="chip-switch-label" id="view-label">View</span>
             <div class="chip-switch-group" role="group" aria-labelledby="view-label">
-              <button type="button" class="chip-btn is-active" data-view="map" aria-pressed="true">Map</button>
-              <button type="button" class="chip-btn" data-view="table" aria-pressed="false">Table</button>
+              <button type="button" class="chip-btn is-active" data-view="map" aria-pressed="true">
+                <svg class="chip-btn-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+                  <path d="M2.5 3.25 6 2.25l4 1.5 3.5-1.5v10.5L10 14l-4-1.5-3.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+                  <path d="M6 2.25v10.25M10 3.75v10.25" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                </svg>
+                Map
+              </button>
+              <button type="button" class="chip-btn" data-view="table" aria-pressed="false">
+                <svg class="chip-btn-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+                  <rect x="2.25" y="2.5" width="11.5" height="11" rx="0.75" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                  <path d="M2.25 6h11.5M2.25 9.75h11.5M6.5 6v7.5M10 6v7.5" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                </svg>
+                Table
+              </button>
             </div>
           </div>
           <div class="chip-switch">
@@ -52,13 +78,13 @@
       <aside id="panel" class="panel">
         <button
           type="button"
-          class="panel-drawer-toggle"
+          class="chrome-toggle panel-drawer-toggle"
           id="panel-drawer-toggle"
           aria-expanded="false"
           aria-controls="panel-body"
           aria-label="Show details"
         >
-          <svg class="panel-drawer-chevron" viewBox="0 0 24 12" width="28" height="14" aria-hidden="true" focusable="false">
+          <svg class="chrome-chevron" viewBox="0 0 24 12" width="28" height="14" aria-hidden="true" focusable="false">
             <path d="M4 9.5 12 2.5l8 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
@@ -72,9 +98,11 @@
               <span>Color map by</span>
               <select id="metric"></select>
             </label>
+            <div class="control">
+              <span>Legend</span>
+              <div id="legend" class="legend"></div>
+            </div>
           </div>
-
-          <div id="legend" class="legend"></div>
 
           <div id="selection" class="selection empty">
             <p class="hint">Click a province on the map.</p>

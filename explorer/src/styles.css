@@ -22,7 +22,7 @@
 }
 
 .app-tip-label {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 14px;
   font-weight: 600;
   font-family: "Segoe UI", "Iowan Old Style", Georgia, serif;
@@ -45,27 +45,27 @@
 
 .app-lens-ring {
   fill: none;
-  stroke: #1a1510;
+  stroke: #000000;
   stroke-width: 1.75px;
   pointer-events: none;
 }
 
 .app-lens-aim {
-  fill: #1a1510;
+  fill: #000000;
   stroke: none;
   pointer-events: none;
 }
 
 .app-lens-cross-h,
 .app-lens-cross-v {
-  stroke: #1a1510;
+  stroke: #000000;
   stroke-width: 1px;
   stroke-opacity: 0.85;
   pointer-events: none;
 }
 
 .app-lens-title {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 28px;
   font-weight: 600;
   font-family: "Libre Baskerville", "Iowan Old Style", Georgia, serif;
@@ -78,7 +78,7 @@
 
 .app-lens-subtitle,
 .app-lens-subtitle2 {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -90,12 +90,21 @@
   stroke: none;
 }
 
+.app-lens-title-at,
+.app-lens-subtitle-at,
+.app-lens-subtitle2-at {
+  fill: transparent;
+  stroke: none;
+  r: 0.01px;
+  pointer-events: none;
+}
+
 /* Composition panels (Option B) */
 
 [class*="app-panel-title-a"],
 [class*="app-panel-title-b"],
 [class*="app-panel-title-c"] {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -113,13 +122,13 @@
 }
 
 [class*="app-panel-fill-"] {
-  fill: #1a1510;
+  fill: #000000;
   stroke: none;
   pointer-events: none;
 }
 
 [class*="app-panel-lbl-"] {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 14px;
   font-weight: 500;
   font-family: "Source Sans 3", "Segoe UI", sans-serif;
@@ -130,7 +139,7 @@
 }
 
 [class*="app-panel-pct-"] {
-  fill: #1a1510;
+  fill: #000000;
   font-size: 14px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -160,7 +169,7 @@
   width: 100%;
   height: 100%;
   background: #ece4d6;
-  color: #1a1510;
+  color: #000000;
   font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   font-size: 16px;
 }
@@ -184,8 +193,16 @@
   min-width: 0;
 }
 
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
 .title-block h1 {
   margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: "Newsreader", "Libre Baskerville", Georgia, serif;
   font-size: clamp(1.75rem, 2.6vw, 2.25rem);
   font-weight: 600;
@@ -194,12 +211,37 @@
   font-optical-sizing: auto;
 }
 
+.chrome-toggle {
+  display: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #8a7660;
+  cursor: pointer;
+  touch-action: manipulation;
+  align-items: center;
+  justify-content: center;
+}
+
+.chrome-toggle:hover,
+.chrome-toggle:focus-visible {
+  color: #000000;
+}
+
+.chrome-chevron {
+  display: block;
+  transition: transform 0.22s ease;
+}
+
+.chrome-toggle[aria-expanded="true"] .chrome-chevron {
+  transform: rotate(180deg);
+}
+
 .subtitle {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.45;
   letter-spacing: 0.01em;
-  color: #4a3f34;
 }
 
 .header-actions {
@@ -214,7 +256,7 @@
 .chip-switch {
   display: inline-flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.35rem 0.55rem;
 }
 
@@ -222,31 +264,44 @@
   font-size: 1rem;
   font-weight: 400;
   font-style: normal;
-  color: #1a1510;
+  color: #000000;
   letter-spacing: 0.02em;
   line-height: 1.2;
 }
 
 .chip-switch-group {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0;
 }
 
 .chip-btn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
   margin: 0;
   padding: 0.15rem 0.42rem;
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #5a4d3e;
   font: inherit;
   font-weight: 400;
   font-style: italic;
   letter-spacing: 0.04em;
   line-height: 1.2;
   cursor: pointer;
+}
+
+.chip-btn-icon {
+  flex-shrink: 0;
+  display: block;
+  opacity: 0.72;
+}
+
+.chip-btn:hover .chip-btn-icon,
+.chip-btn.is-active .chip-btn-icon {
+  opacity: 1;
 }
 
 .chip-btn + .chip-btn::before {
@@ -262,7 +317,7 @@
 }
 
 .chip-btn:hover {
-  color: #1a1510;
+  color: #000000;
 }
 
 .chip-btn:focus-visible {
@@ -272,7 +327,7 @@
 }
 
 .chip-btn.is-active {
-  color: #1a1510;
+  color: #000000;
   font-style: normal;
   font-weight: 600;
 }
@@ -345,7 +400,7 @@
   width: 100%;
   border: 1px solid #b8a88f;
   background: #fffdf8;
-  color: #1a1510;
+  color: #000000;
   border-radius: 4px;
   padding: 0.5rem 0.65rem;
   font: inherit;
@@ -359,8 +414,6 @@
 
 .table-meta {
   margin-left: auto;
-  font-size: 0.875rem;
-  color: #6b5b48;
 }
 
 .table-status {
@@ -368,7 +421,6 @@
   place-items: center;
   height: 100%;
   min-height: 12rem;
-  color: #6b5b48;
   font-size: 1rem;
 }
 
@@ -443,9 +495,7 @@
   z-index: 1;
   background: #f3ebdd;
   border-bottom: 1px solid #cbbfaa;
-  font-size: 0.875rem;
   font-weight: 650;
-  color: #4a3f34;
   white-space: nowrap;
 }
 
@@ -475,13 +525,11 @@
 
 .cell-name {
   font-weight: 600;
-  color: #1a1510;
+  color: #000000;
 }
 
 .cell-sub {
   margin-top: 0.1rem;
-  font-size: 0.875rem;
-  color: #6b5b48;
 }
 
 .table-empty td {
@@ -511,10 +559,6 @@
   background: #f7f1e6;
 }
 
-.panel-drawer-toggle {
-  display: none;
-}
-
 .panel-body {
   display: flex;
   flex-direction: column;
@@ -534,7 +578,6 @@
 .panel-header .lede {
   font-size: 1rem;
   line-height: 1.45;
-  color: #4a3f34;
 }
 
 .panel-header .lede-hint {
@@ -554,16 +597,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.875rem;
-  color: #5a4d3e;
 }
 
 .control select {
-  appearance: none;
-  border: 1px solid #b8a88f;
+  border: 0px;
   background: #fffdf8;
-  color: #1a1510;
-  border-radius: 4px;
+  color: #000000;
   padding: 0.45rem 0.55rem;
   font: inherit;
 }
@@ -577,7 +616,7 @@
 .seg-btn {
   border: 1px solid #b8a88f;
   background: #fffdf8;
-  color: #1a1510;
+  color: #000000;
   border-radius: 4px;
   padding: 0.45rem 0.5rem;
   cursor: pointer;
@@ -595,23 +634,25 @@
   flex-direction: column;
   padding: 0.65rem 0.7rem;
   background: #fffdf8;
-  border: 1px solid #d6c9b4;
-  border-radius: 4px;
+  border: 0px;
 }
 
-.legend-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
-  color: #4a3f34;
+.legend-rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0.75rem;
+  row-gap: 0.12rem;
 }
 
 .legend-row {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 0.45rem;
-  font-size: 0.875rem;
-  color: #5a4d3e;
+}
+
+.legend > .legend-row {
+  margin-top: 0.2rem;
 }
 
 .swatch {
@@ -639,11 +680,9 @@
 }
 
 .census-callout-title {
-  font-size: 0.875rem;
   font-weight: 650;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #6b5b48;
   margin-bottom: 0.3rem;
 }
 
@@ -660,7 +699,6 @@
   border-radius: 3px;
   background: #cfc6b8;
   color: #3f3429;
-  font-size: 0.875rem;
   font-weight: 650;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -688,10 +726,8 @@
 }
 
 .year-tag {
-  font-size: 0.875rem;
-  letter-spacing: 0.06em;
+  text-align: center;
   text-transform: uppercase;
-  color: #6b5b48;
 }
 
 .selection h2 {
@@ -702,7 +738,6 @@
 
 .rus {
   font-size: 1rem;
-  color: #5a4d3e;
   margin-top: -0.65rem;
 }
 
@@ -720,7 +755,6 @@
 }
 
 .stats dt {
-  font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -805,9 +839,53 @@
     align-items: stretch;
   }
 
+  .subtitle {
+    display: none;
+  }
+
+  .site-header.is-actions-open .subtitle {
+    display: block;
+    margin-top: 0.35rem;
+  }
+
+  .title-row {
+    align-items: center;
+  }
+
+  .header-actions-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 0.35rem;
+  }
+
+  .header-actions-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 2px;
+  }
+
+  /* Expand controls below the title: start pointing down */
+  .header-actions-toggle .chrome-chevron {
+    transform: rotate(180deg);
+  }
+
+  .header-actions-toggle[aria-expanded="true"] .chrome-chevron {
+    transform: none;
+  }
+
   .header-actions {
+    display: none;
     gap: 0.45rem 1.1rem;
     padding-top: 0;
+  }
+
+  .site-header.is-actions-open .header-actions {
+    display: flex;
+  }
+
+  [class*="app-panel-title-b"],
+  [class*="app-panel-lbl-b-"] {
+    text-anchor: end;
   }
 
   .view-map.active {
@@ -837,46 +915,29 @@
 
   .panel.is-open {
     /* Cap near empty chrome (lede + controls + legend + hint), not full screen */
-    max-height: 24rem;
+    max-height: min(70%, 24rem);
+  }
+
+  .panel:not(.is-open) .panel-body {
+    display: none;
   }
 
   .panel-drawer-toggle {
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex: 0 0 auto;
     width: 100%;
-    margin: 0;
     padding: 0.45rem 1rem 0.4rem;
-    border: 0;
     border-bottom: 1px solid transparent;
-    background: transparent;
-    color: #8a7660;
-    cursor: pointer;
-    touch-action: manipulation;
+    background: #f7f1e6;
   }
 
   .panel.is-open .panel-drawer-toggle {
     border-bottom-color: #e4d8c4;
   }
 
-  .panel-drawer-toggle:hover,
-  .panel-drawer-toggle:focus-visible {
-    color: #1a1510;
-  }
-
   .panel-drawer-toggle:focus-visible {
     outline: none;
     box-shadow: inset var(--focus-ring);
-  }
-
-  .panel-drawer-chevron {
-    display: block;
-    transition: transform 0.22s ease;
-  }
-
-  .panel.is-open .panel-drawer-chevron {
-    transform: rotate(180deg);
   }
 
   .panel-body {
@@ -895,7 +956,7 @@
 
 @media (max-width: 860px) and (prefers-reduced-motion: reduce) {
   .panel,
-  .panel-drawer-chevron {
+  .chrome-chevron {
     transition: none;
   }
 }

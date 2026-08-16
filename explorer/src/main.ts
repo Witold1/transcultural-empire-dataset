@@ -114,6 +114,10 @@ const panelEl = document.getElementById("panel") as HTMLElement;
 const panelDrawerToggle = document.getElementById(
   "panel-drawer-toggle"
 ) as HTMLButtonElement;
+const siteHeader = document.querySelector(".site-header") as HTMLElement;
+const headerActionsToggle = document.getElementById(
+  "header-actions-toggle"
+) as HTMLButtonElement;
 const metricSelect = document.getElementById("metric") as HTMLSelectElement;
 const legendEl = document.getElementById("legend") as HTMLDivElement;
 const selectionEl = document.getElementById("selection") as HTMLDivElement;
@@ -134,6 +138,18 @@ const { map, rvg } = MapAdapter.create(mapRoot, "app-", {
   minZoom: 1.5,
   maxZoom: 8,
 });
+
+function setHeaderActionsOpen(open: boolean): void {
+  siteHeader.classList.toggle("is-actions-open", open);
+  headerActionsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  headerActionsToggle.setAttribute(
+    "aria-label",
+    open ? "Hide controls" : "Show controls"
+  );
+  if (view === "map") {
+    requestAnimationFrame(() => map.map?.resize());
+  }
+}
 
 function toLensSelection(props: UnitProps): LensSelection | null {
   const geom = featuresByIdGeom.get(props.id);
@@ -240,9 +256,10 @@ function renderLegend(edges: number[], metric: MetricDef): void {
       ? `<div class="legend-row"><span class="swatch" style="background:${NO_CENSUS_FILL}"></span><span>Not in 1897 Census</span></div>`
       : "";
   if (metric.id === "none") {
-    legendEl.innerHTML = `<div class="legend-title">Regions</div>
-      <div class="legend-row"><span class="swatch" style="background:${PLAIN_FILL}"></span><span>Covered by census</span></div>
-      ${noCensusRow}`;
+    legendEl.innerHTML = `<div class="legend-rows">
+        <div class="legend-row"><span class="swatch" style="background:${PLAIN_FILL}"></span><span>Covered by census</span></div>
+        ${noCensusRow}
+      </div>`;
     return;
   }
   const swatches = COLORS.map((c, i) => {
@@ -256,7 +273,8 @@ function renderLegend(edges: number[], metric: MetricDef): void {
           : `${lo.toFixed(2)}-${hi.toFixed(2)}`;
     return `<div class="legend-row"><span class="swatch" style="background:${c}"></span><span>${label}</span></div>`;
   }).join("");
-  legendEl.innerHTML = `<div class="legend-title">Legend of ${metric.label}</div>${swatches}${noCensusRow}`;
+  legendEl.innerHTML = `<div class="legend-rows">${swatches}</div>
+    ${noCensusRow}`;
 }
 
 function groupBlocks(props: UnitProps): string {
@@ -635,8 +653,16 @@ function wireUi(): void {
     setPanelDrawerOpen(!panelEl.classList.contains("is-open"));
   });
 
+  headerActionsToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setHeaderActionsOpen(!siteHeader.classList.contains("is-actions-open"));
+  });
+
   mobilePanelMq.addEventListener("change", (e) => {
-    if (!e.matches) setPanelDrawerOpen(false);
+    if (!e.matches) {
+      setPanelDrawerOpen(false);
+      setHeaderActionsOpen(false);
+    }
   });
 
   document.querySelectorAll<HTMLButtonElement>(".chip-btn[data-view]").forEach((btn) => {
